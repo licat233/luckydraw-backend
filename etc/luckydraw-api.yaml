@@ -7,7 +7,7 @@ Log:
   Level: error
 
 Mysql:
-  DataSource: root:@tcp(127.0.0.1:3306)/luckydraw?parseTime=True&charset=utf8mb4&collation=utf8mb4_0900_ai_ci&loc=Asia%2FShanghai
+  DataSource: root:@tcp(mysql:3306)/luckydraw?parseTime=True&charset=utf8mb4&collation=utf8mb4_0900_ai_ci&loc=Asia%2FShanghai
 
 Auth:
   AccessSecret: wwwpppooowwwoooo

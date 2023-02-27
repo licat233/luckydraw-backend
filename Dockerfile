@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine AS builder
+FROM golang:1.20.1-alpine AS builder
 
 #搭建开发环境
 LABEL stage=gobuilder

@@ -1,0 +1,84 @@
+version: "3.9"
+# 网络配置
+networks:
+  backend_net:
+    driver: bridge
+
+# 服务容器配置
+services:
+  # app服务
+  web:
+    build:
+      context: .
+    hostname: web
+    container_name: luckydraw_web
+    environment:
+      - TZ=Asia/Shanghai
+      - GOPROXY=https://goproxy.cn,direct
+    volumes:
+      - .:/app
+    ports:
+      - 6868:8888
+    working_dir: /app
+    restart: on-failure
+    privileged: true
+    stdin_open: true # 打开标准输入，可以接受外部输入
+    tty: true
+    networks:
+      - backend_net
+
+  #mysql数据库容器
+  mysql:
+    image: mysql:8.0.32
+    container_name: luckydraw_mysql
+    hostname: mysql
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_DATABASE=luckydraw
+      - MYSQL_USER=root
+      # - MYSQL_PASSWORD=123456
+      # - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    expose:
+      - 3306
+    volumes:
+      # 数据挂载 - Data mounting
+      - ./data/mysql/data:/var/lib/mysql
+      - ./data/mysql/sqlfile:/home/sqlfile
+      # 日志
+    command:
+      # 将mysql8.0默认密码策略 修改为 原先 策略 (mysql8.0对其默认策略做了更改 会导致密码无法匹配)
+      # Modify the Mysql 8.0 default password strategy to the original strategy (MySQL8.0 to change its default strategy will cause the password to be unable to match)
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_0900_ai_ci
+      --explicit_defaults_for_timestamp=true
+      --lower_case_table_names=1
+    privileged: true
+    restart: on-failure
+    networks:
+      - backend_net
+
+  #phpmyadmin
+  mysql_manage:
+    image: phpmyadmin:latest
+    container_name: luckydraw_phpmyadmin
+    hostname: phpmyadmin
+    restart: on-failure
+    ports:
+      - 6869:80
+      - 8080
+    environment:
+      - TZ=Asia/Shanghai
+      - PMA_ARBITRARY=1 #当设置为 1 连接到任意服务器将被允许
+      - PMA_HOST=mysql #定义 MySQL 服务器的地址/主机名
+      - PMA_PORT=3306 # 定义 MySQL 服务器的端口
+      - PMA_VERBOSE=luckydraw_mysql #MySQL 服务器的详细名称
+      - PMA_USER=root
+      - PMA_PASSWORD=admin
+      - PMA_CONTROLUSER=root
+      - PMA_CONTROLPASS=admin
+    depends_on:
+      - mysql
+    networks:
+      - backend_net
