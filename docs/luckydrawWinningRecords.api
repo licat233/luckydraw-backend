@@ -1,0 +1,146 @@
+syntax = "v1"
+
+// ------------------------------ Import Start ------------------------------
+
+// The content in this block will not be updated
+// 此区块内的内容不会被更新
+//[custom import start]
+
+//[custom import end]
+
+// ------------------------------ Struct Start ------------------------------
+
+//------------------
+
+//
+type WinningRecords {
+  Id int64 `json:"id"`
+  UserId int64 `json:"userId"`
+  AwardId int64 `json:"awardId"`
+  ActivityId int64 `json:"activityId"`
+  Ip string `json:"ip"`
+  Platform string `json:"platform"`
+}
+
+//添加请求
+type AddWinningRecordsReq {
+  UserId int64 `json:"userId"`
+  AwardId int64 `json:"awardId"`
+  ActivityId int64 `json:"activityId"`
+  Ip string `json:"ip"`
+  Platform string `json:"platform"`
+}
+
+//更新请求
+type PutWinningRecordsReq {
+  Id int64 `json:"id"`
+  UserId int64 `json:"userId"`
+  AwardId int64 `json:"awardId"`
+  ActivityId int64 `json:"activityId"`
+  Ip string `json:"ip"`
+  Platform string `json:"platform"`
+}
+
+//删除请求
+type DelWinningRecordsReq {
+  Id int64 `json:"id"`  // ID
+}
+
+//获取请求
+type GetWinningRecordsReq {
+  Id int64 `form:"id"`  // ID
+}
+
+//获取列表请求
+type GetWinningRecordsListReq {
+  PageSize int64 `form:"pageSize,optional,default=20"`  // 页面容量，默认20，可选
+  Page int64 `form:"page,optional,default=1"`  // 当前页码，默认1，可选
+  Current int64 `form:"current,optional,default=1"`  // 当前页码，默认1，用于对接umijs，可选
+  Keyword string `form:"keyword,optional"`  // 关键词，可选
+  Id int64 `form:"id,optional,default=-1"`
+  UserId int64 `form:"userId,optional,default=-1"`
+  AwardId int64 `form:"awardId,optional,default=-1"`
+  ActivityId int64 `form:"activityId,optional,default=-1"`
+  Ip string `form:"ip,optional"`
+  Platform string `form:"platform,optional"`
+}
+
+//获取枚举请求
+type GetWinningRecordsEnumsReq {
+  ParentId int64 `form:"parentId,optional,default=-1"`  // 父级ID
+}
+
+// The content in this block will not be updated
+// 此区块内的内容不会被更新
+//[custom struct start]
+
+type queryReq {
+  Passport     string `json:"passport,optional"`
+  ActivityUuid string `json:"activityUuid,optional"`
+}
+
+type WinningRecordsInfo {
+  WinningRecord  *WinningRecords `json:"winningRecord,optional"`
+  Award          *PublicAwards   `json:"award,optional"`
+}
+
+type WinningRecordsDetail {
+  WinningRecord  *WinningRecords `json:"winningRecord,optional"`
+  Award          *Awards          `json:"award,optional"`
+  User           *Users          `json:"user,optional"`
+  Activity       *Activity       `json:"activity,optional"`
+}
+
+//[custom struct end]
+
+// ------------------------------ Service Start ------------------------------
+@server(
+  jwt: Auth
+  group: winningRecords
+  middleware: AuthMiddleware
+  prefix: api/winningRecords
+)
+service luckydraw-api {
+
+  @doc "添加 基础API"
+  @handler AddWinningRecords
+  post /(AddWinningRecordsReq) returns (BaseResp)
+
+  @doc "更新 基础API"
+  @handler PutWinningRecords
+  put /(PutWinningRecordsReq) returns (BaseResp)
+
+  @doc "获取 基础API"
+  @handler GetWinningRecords
+  get /(GetWinningRecordsReq) returns (BaseResp)
+
+  @doc "删除 基础API"
+  @handler DelWinningRecords
+  delete /(DelWinningRecordsReq) returns (BaseResp)
+
+  @doc "获取列表 基础API"
+  @handler GetWinningRecordsList
+  get /list(GetWinningRecordsListReq) returns (BaseResp)
+
+  @doc "获取枚举列表 基础API"
+  @handler GetWinningRecordsEnums
+  get /enums(GetWinningRecordsEnumsReq) returns (BaseResp)
+
+}
+
+// The content in this block will not be updated
+// 此区块内的内容不会被更新
+//[custom service start]
+
+@server(
+  group: winningRecords
+  middleware: UserAuthMiddleware
+  prefix: api/winningRecords
+)
+service luckydraw-api {
+  @doc "中奖记录查询接口"
+  @handler Query
+  post /query(queryReq) returns (BaseResp)
+}
+
+//[custom service end]

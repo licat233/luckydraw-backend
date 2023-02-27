@@ -1,0 +1,148 @@
+syntax = "v1"
+
+// ------------------------------ Import Start ------------------------------
+
+// The content in this block will not be updated
+// 此区块内的内容不会被更新
+//[custom import start]
+
+//[custom import end]
+
+// ------------------------------ Struct Start ------------------------------
+
+//------------------
+
+//
+type Adminer {
+  Id int64 `json:"id"`
+  Username string `json:"username"`
+  Password string `json:"password"`
+  Access string `json:"access"`
+  IsSuper int64 `json:"isSuper"`
+}
+
+//添加请求
+type AddAdminerReq {
+  Username string `json:"username"`
+  Password string `json:"password"`
+  Access string `json:"access"`
+  IsSuper int64 `json:"isSuper"`
+}
+
+//更新请求
+type PutAdminerReq {
+  Id int64 `json:"id"`
+  Username string `json:"username"`
+  Password string `json:"password"`
+  Access string `json:"access"`
+  IsSuper int64 `json:"isSuper"`
+}
+
+//删除请求
+type DelAdminerReq {
+  Id int64 `json:"id"`  // ID
+}
+
+//获取请求
+type GetAdminerReq {
+  Id int64 `form:"id"`  // ID
+}
+
+//获取列表请求
+type GetAdminerListReq {
+  PageSize int64 `form:"pageSize,optional,default=20"`  // 页面容量，默认20，可选
+  Page int64 `form:"page,optional,default=1"`  // 当前页码，默认1，可选
+  Current int64 `form:"current,optional,default=1"`  // 当前页码，默认1，用于对接umijs，可选
+  Keyword string `form:"keyword,optional"`  // 关键词，可选
+  Id int64 `form:"id,optional,default=-1"`
+  Username string `form:"username,optional"`
+  Password string `form:"password,optional"`
+  Access string `form:"access,optional"`
+  IsSuper int64 `form:"isSuper,optional,default=-1"`
+}
+
+//获取枚举请求
+type GetAdminerEnumsReq {
+  ParentId int64 `form:"parentId,optional,default=-1"`  // 父级ID
+}
+
+// The content in this block will not be updated
+// 此区块内的内容不会被更新
+//[custom struct start]
+
+type AdminerLoginReq {
+  Username  string   `json:"username"`
+  Password  string   `json:"password"`
+  AutoLogin bool     `json:"autoLogin"`
+  CaptchaId string   `json:"captchaId"`
+  Solution  string   `json:"solution"`
+}
+
+//[custom struct end]
+
+// ------------------------------ Service Start ------------------------------
+@server(
+  jwt: Auth
+  group: adminer
+  middleware: AuthMiddleware
+  prefix: api/adminer
+)
+service luckydraw-api {
+
+  @doc "添加 基础API"
+  @handler AddAdminer
+  post /(AddAdminerReq) returns (BaseResp)
+
+  @doc "更新 基础API"
+  @handler PutAdminer
+  put /(PutAdminerReq) returns (BaseResp)
+
+  @doc "获取 基础API"
+  @handler GetAdminer
+  get /(GetAdminerReq) returns (BaseResp)
+
+  @doc "删除 基础API"
+  @handler DelAdminer
+  delete /(DelAdminerReq) returns (BaseResp)
+
+  @doc "获取列表 基础API"
+  @handler GetAdminerList
+  get /list(GetAdminerListReq) returns (BaseResp)
+
+  @doc "获取枚举列表 基础API"
+  @handler GetAdminerEnums
+  get /enums(GetAdminerEnumsReq) returns (BaseResp)
+
+}
+
+// The content in this block will not be updated
+// 此区块内的内容不会被更新
+//[custom service start]
+
+@server(
+  group: adminer
+  prefix: api
+)
+service luckydraw-api {
+  @doc "管理员登录"
+  @handler AdminerLogin
+  post /login(AdminerLoginReq) returns (BaseResp)
+}
+
+@server(
+  jwt: Auth
+  group: adminer
+  middleware: AuthMiddleware
+  prefix: api
+)
+service luckydraw-api {
+  @doc "获取当前信息"
+  @handler CurrentAdminer
+  get /currentAdminer returns (BaseResp)
+
+  @doc "退出登录"
+  @handler AdminerLogout
+  get /logout returns (BaseResp)
+}
+
+//[custom service end]

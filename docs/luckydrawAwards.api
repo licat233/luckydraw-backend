@@ -1,0 +1,169 @@
+syntax = "v1"
+
+// ------------------------------ Import Start ------------------------------
+
+// The content in this block will not be updated
+// 此区块内的内容不会被更新
+//[custom import start]
+
+//[custom import end]
+
+// ------------------------------ Struct Start ------------------------------
+
+//------------------
+
+//
+type Awards {
+  Id int64 `json:"id"`
+  ActivityId int64 `json:"activityId"`
+  Uuid string `json:"uuid"`
+  Grade string `json:"grade"`
+  Name string `json:"name"`
+  Image string `json:"image"`
+  Price float64 `json:"price"`  // 奖品价格
+  Prob int64 `json:"prob"`
+  Quantity int64 `json:"quantity"`  // 总数量
+  Count int64 `json:"count"`  // 已抽数量
+  IsWin int64 `json:"isWin"`  // 是否中奖
+}
+
+//添加请求
+type AddAwardsReq {
+  ActivityId int64 `json:"activityId"`
+  Grade string `json:"grade"`
+  Name string `json:"name"`
+  Image string `json:"image"`
+  Price float64 `json:"price"`  // 奖品价格
+  Prob int64 `json:"prob"`
+  Quantity int64 `json:"quantity"`  // 总数量
+  Count int64 `json:"count"`  // 已抽数量
+  IsWin int64 `json:"isWin"`  // 是否中奖
+}
+
+//更新请求
+type PutAwardsReq {
+  Id int64 `json:"id"`
+  ActivityId int64 `json:"activityId"`
+  Uuid string `json:"uuid"`
+  Grade string `json:"grade"`
+  Name string `json:"name"`
+  Image string `json:"image"`
+  Price float64 `json:"price"`  // 奖品价格
+  Prob int64 `json:"prob"`
+  Quantity int64 `json:"quantity"`  // 总数量
+  Count int64 `json:"count"`  // 已抽数量
+  IsWin int64 `json:"isWin"`  // 是否中奖
+}
+
+//删除请求
+type DelAwardsReq {
+  Id int64 `json:"id"`  // ID
+}
+
+//获取请求
+type GetAwardsReq {
+  Id int64 `form:"id"`  // ID
+}
+
+//获取列表请求
+type GetAwardsListReq {
+  PageSize int64 `form:"pageSize,optional,default=20"`  // 页面容量，默认20，可选
+  Page int64 `form:"page,optional,default=1"`  // 当前页码，默认1，可选
+  Current int64 `form:"current,optional,default=1"`  // 当前页码，默认1，用于对接umijs，可选
+  Keyword string `form:"keyword,optional"`  // 关键词，可选
+  Id int64 `form:"id,optional,default=-1"`
+  ActivityId int64 `form:"activityId,optional,default=-1"`
+  Uuid string `form:"uuid,optional"`
+  Grade string `form:"grade,optional"`
+  Name string `form:"name,optional"`
+  Image string `form:"image,optional"`
+  Price float64 `form:"price,optional,default=-1"`  // 奖品价格
+  Prob int64 `form:"prob,optional,default=-1"`
+  Quantity int64 `form:"quantity,optional,default=-1"`  // 总数量
+  Count int64 `form:"count,optional,default=-1"`  // 已抽数量
+  IsWin int64 `form:"isWin,optional,default=-1"`  // 是否中奖
+}
+
+//获取枚举请求
+type GetAwardsEnumsReq {
+  ParentId int64 `form:"parentId,optional,default=-1"`  // 父级ID
+}
+
+// The content in this block will not be updated
+// 此区块内的内容不会被更新
+//[custom struct start]
+
+type GetAwardsListByActivityUuidReq {
+  ActivityUuid string `json:"activityUuid"`
+}
+
+type PublicAwards {
+  Id int64 `json:"id"`
+  Uuid string `json:"uuid"`
+  Grade string `json:"grade"`
+  Name string `json:"name"`
+  Image string `json:"image"`
+  Price float64 `json:"price"`
+  IsWin bool `json:"is_win"`
+}
+
+type SelectAwardsByIdsReq {
+  Ids []int64 `json:"ids"`
+}
+
+//[custom struct end]
+
+// ------------------------------ Service Start ------------------------------
+@server(
+  jwt: Auth
+  group: awards
+  middleware: AuthMiddleware
+  prefix: api/awards
+)
+service luckydraw-api {
+
+  @doc "添加 基础API"
+  @handler AddAwards
+  post /(AddAwardsReq) returns (BaseResp)
+
+  @doc "更新 基础API"
+  @handler PutAwards
+  put /(PutAwardsReq) returns (BaseResp)
+
+  @doc "获取 基础API"
+  @handler GetAwards
+  get /(GetAwardsReq) returns (BaseResp)
+
+  @doc "删除 基础API"
+  @handler DelAwards
+  delete /(DelAwardsReq) returns (BaseResp)
+
+  @doc "获取列表 基础API"
+  @handler GetAwardsList
+  get /list(GetAwardsListReq) returns (BaseResp)
+
+  @doc "获取枚举列表 基础API"
+  @handler GetAwardsEnums
+  get /enums(GetAwardsEnumsReq) returns (BaseResp)
+
+}
+
+// The content in this block will not be updated
+// 此区块内的内容不会被更新
+//[custom service start]
+
+@server(
+  group: awards
+  prefix: api/awards
+)
+service luckydraw-api {
+  @doc "获取某活动的奖项信息"
+  @handler GetAwardsListByActivityUuid
+  post /list(GetAwardsListByActivityUuidReq) returns (BaseResp)
+
+  @doc "筛选by id list"
+  @handler SelectAwardsByIds
+  post /selectAwardsByIds(SelectAwardsByIdsReq) returns (BaseResp)
+}
+
+//[custom service end]

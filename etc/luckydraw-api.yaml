@@ -1,0 +1,14 @@
+Name: luckydraw-api
+Host: 0.0.0.0
+Port: 8888
+
+Log:
+  Mode: file
+  Level: error
+
+Mysql:
+  DataSource: root:@tcp(127.0.0.1:3306)/luckydraw?parseTime=True&charset=utf8mb4&collation=utf8mb4_0900_ai_ci&loc=Asia%2FShanghai
+
+Auth:
+  AccessSecret: wwwpppooowwwoooo
+  AccessExpire: 86400

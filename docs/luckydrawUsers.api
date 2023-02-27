@@ -1,0 +1,177 @@
+syntax = "v1"
+
+// ------------------------------ Import Start ------------------------------
+
+// The content in this block will not be updated
+// 此区块内的内容不会被更新
+//[custom import start]
+
+//[custom import end]
+
+// ------------------------------ Struct Start ------------------------------
+
+//------------------
+
+//
+type Users {
+  Id int64 `json:"id"`
+  ActivityId int64 `json:"activityId"`
+  AvailableAwards string `json:"availableAwards"`  // 指定其可抽中的奖品
+  Name string `json:"name"`
+  Passport string `json:"passport"`
+  Count int64 `json:"count"`  // 抽獎次數
+  Total int64 `json:"total"`
+}
+
+//添加请求
+type AddUsersReq {
+  ActivityId int64 `json:"activityId"`
+  AvailableAwards string `json:"availableAwards"`  // 指定其可抽中的奖品
+  Name string `json:"name"`
+  Passport string `json:"passport"`
+  Count int64 `json:"count"`  // 抽獎次數
+  Total int64 `json:"total"`
+}
+
+//更新请求
+type PutUsersReq {
+  Id int64 `json:"id"`
+  ActivityId int64 `json:"activityId"`
+  AvailableAwards string `json:"availableAwards"`  // 指定其可抽中的奖品
+  Name string `json:"name"`
+  Passport string `json:"passport"`
+  Count int64 `json:"count"`  // 抽獎次數
+  Total int64 `json:"total"`
+}
+
+//删除请求
+type DelUsersReq {
+  Id int64 `json:"id"`  // ID
+}
+
+//获取请求
+type GetUsersReq {
+  Id int64 `form:"id"`  // ID
+}
+
+//获取列表请求
+type GetUsersListReq {
+  PageSize int64 `form:"pageSize,optional,default=20"`  // 页面容量，默认20，可选
+  Page int64 `form:"page,optional,default=1"`  // 当前页码，默认1，可选
+  Current int64 `form:"current,optional,default=1"`  // 当前页码，默认1，用于对接umijs，可选
+  Keyword string `form:"keyword,optional"`  // 关键词，可选
+  Id int64 `form:"id,optional,default=-1"`
+  ActivityId int64 `form:"activityId,optional,default=-1"`
+  AvailableAwards string `form:"availableAwards,optional"`  // 指定其可抽中的奖品
+  Name string `form:"name,optional"`
+  Passport string `form:"passport,optional"`
+  Count int64 `form:"count,optional,default=-1"`  // 抽獎次數
+  Total int64 `form:"total,optional,default=-1"`
+}
+
+//获取枚举请求
+type GetUsersEnumsReq {
+  ParentId int64 `form:"parentId,optional,default=-1"`  // 父级ID
+}
+
+// The content in this block will not be updated
+// 此区块内的内容不会被更新
+//[custom struct start]
+
+type UserRegisterReq {
+  UserPassport string `json:"userPassport"` //用户凭证
+  ActivityUuid string  `json:"activityUuid"`  //活动凭证
+  SecretKey string `json:"secretKey"` //密钥
+}
+
+type UserLoginReq{
+  Passport string    `json:"passport"`  //用户凭证
+  ActivityUuid string    `json:"activityUuid"`  //活动凭证
+}
+
+type PublicUser {
+  Id int64 `json:"id"`
+  ActivityId int64 `json:"activity_id"`
+  Passport string `json:"passport"`
+  Count int64 `json:"count"`  // 抽獎次數
+  Total int64 `json:"total"`
+}
+
+type currentUserReq {
+  Passport     string `json:"passport,optional"`
+  ActivityUuid string `json:"activityUuid,optional"`
+}
+
+type UserDetail {
+  User            *Users      `json:"user,optional"`
+  Activity        *Activity   `json:"activity,optional"`
+  AvailableAwards []*Awards    `json:"availableAwards,optional"`
+}
+
+//[custom struct end]
+
+// ------------------------------ Service Start ------------------------------
+@server(
+  jwt: Auth
+  group: users
+  middleware: AuthMiddleware
+  prefix: api/users
+)
+service luckydraw-api {
+
+  @doc "添加 基础API"
+  @handler AddUsers
+  post /(AddUsersReq) returns (BaseResp)
+
+  @doc "更新 基础API"
+  @handler PutUsers
+  put /(PutUsersReq) returns (BaseResp)
+
+  @doc "获取 基础API"
+  @handler GetUsers
+  get /(GetUsersReq) returns (BaseResp)
+
+  @doc "删除 基础API"
+  @handler DelUsers
+  delete /(DelUsersReq) returns (BaseResp)
+
+  @doc "获取列表 基础API"
+  @handler GetUsersList
+  get /list(GetUsersListReq) returns (BaseResp)
+
+  @doc "获取枚举列表 基础API"
+  @handler GetUsersEnums
+  get /enums(GetUsersEnumsReq) returns (BaseResp)
+
+}
+
+// The content in this block will not be updated
+// 此区块内的内容不会被更新
+//[custom service start]
+
+@server(
+  group: users
+  prefix: api/users
+)
+service luckydraw-api {
+  @doc "用户注册"
+  @handler UserRegister
+  post /register(UserRegisterReq) returns (BaseResp)
+
+  @doc "用户登录"
+  @handler UserLogin
+  post /login(UserLoginReq) returns (BaseResp)
+}
+
+@server(
+  group: users
+  middleware: UserAuthMiddleware
+  prefix: api/users
+)
+service luckydraw-api {
+  @doc "当前用户"
+  @handler CurrentUser
+  post /currentUser(currentUserReq) returns (BaseResp)
+}
+
+//[custom service end]
