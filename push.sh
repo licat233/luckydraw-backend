@@ -17,6 +17,7 @@ current_path=$(
 
 cd $current_path
 
+git rm -r --cached .
 git add .
 git commit -m "update"
 git push origin main
