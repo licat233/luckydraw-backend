@@ -22,6 +22,9 @@ func NewAuthMiddleware(c config.Config) *AuthMiddleware {
 
 func (m *AuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		//获取url
+		url := r.URL.Path
+
 		// 从请求头中获取token
 		jwtToken := r.Header.Get("Authorization")
 		if jwtToken == "" {
@@ -38,8 +41,6 @@ func (m *AuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		// 获取身份
 		access := jwtx.GetClaimsValue("access", *claims)
 
-		//获取url
-		url := r.URL.Path
 		if strings.HasPrefix(url, "/api/adminer/") {
 			if access != "super" {
 				httpx.Error(w, errorx.ErrAuth)
