@@ -8,6 +8,7 @@
 package svc
 
 import (
+	"log"
 	"luckydraw-backend/internal/config"
 	"luckydraw-backend/internal/middleware"
 	"luckydraw-backend/model"
@@ -35,6 +36,15 @@ type ServiceContext struct {
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	sqlConn := sqlx.NewMysql(c.Mysql.DataSource)
+
+	db, err := sqlConn.RawDB()
+	if err != nil {
+		log.Fatalln("创建数据库链接失败", c.Mysql.DataSource)
+	}
+	if db.Ping() != nil {
+		log.Fatalln("数据库链接失败", c.Mysql.DataSource)
+	}
+	// defer db.Close()
 
 	captchaExpire := time.Minute * 5
 

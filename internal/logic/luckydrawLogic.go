@@ -136,24 +136,14 @@ func (l *LuckydrawLogic) Luckydraw(req *types.LuckydrawReq) (any, error) {
 		return nil, errorx.New("🔥🔥當前活動太火爆，伺服器擁堵，請稍後再重試...")
 	}
 
-	isRegistered := userId > 1
+	// isRegistered := userId > 0
 
 	//非註冊用戶，不让中奖
-	mustFail := !isRegistered
-	award, err := randomAward(awards, mustFail, availableAwardsIds)
+	// mustFail := !isRegistered
+	award, err := randomAward(awards, false, availableAwardsIds)
 	if err != nil {
 		l.Logger.Errorf("随机奖品失败，err:%v", err)
 		return nil, errorx.InternalError(err)
-	}
-
-	//做最后的校验
-	if award.IsWin > 0 {
-		//如果没有注册过
-		if !isRegistered {
-			return nil, errorx.New("Sorry！你暫無抽獎權限，可聯絡客服獲取", "")
-			//那就提示网络拥堵，抽奖人数过多，请稍后再试
-			// return nil, errorx.New("🔥🔥當前活動太火爆，伺服器擁堵，請稍後再重試...", "")
-		}
 	}
 
 	//存入记录
