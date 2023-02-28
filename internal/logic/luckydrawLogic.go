@@ -122,13 +122,6 @@ func (l *LuckydrawLogic) Luckydraw(req *types.LuckydrawReq) (any, error) {
 		return nil, errorx.New("Sorry！你的抽獎次數已用完，請聯絡客服獲取", "")
 	}
 
-	//查询是否已经抽中过奖品
-	// list, err := l.svcCtx.WinningRecordsModel.FindsByUserIdAndActivityId(l.ctx, userId, activityId)
-	// if err != nil {
-	// 	l.Logger.Errorf("查询是否抽中过奖品失败，err:%v", err)
-	// 	return nil, errorx.InternalError(err)
-	// }
-	// var luckyCount int64 = int64(len(list))
 	if user.Count >= user.Total {
 		return nil, errorx.New("Sorry！你的抽獎次數已用完，請聯絡客服獲取", "")
 	}
@@ -139,6 +132,12 @@ func (l *LuckydrawLogic) Luckydraw(req *types.LuckydrawReq) (any, error) {
 		availableAwardsIds = getAvailableAwardsId(user.AvailableAwards)
 	}
 
+	//如果没有可抽中的奖品
+	if len(availableAwardsIds) == 0 {
+		//找个理由搪塞过去
+		return nil, errorx.New("🔥🔥當前活動太火爆，伺服器擁堵，請稍後再重試...")
+	}
+
 	//获取奖品列表
 	awards, err := l.svcCtx.AwardsModel.FindsByActivityId(l.ctx, activityId)
 	if err != nil {
@@ -146,10 +145,9 @@ func (l *LuckydrawLogic) Luckydraw(req *types.LuckydrawReq) (any, error) {
 		return nil, errorx.InternalError(err)
 	}
 	if len(awards) == 0 {
-		return nil, errorx.New("Sorry！暫無可抽獎品", "")
+		return nil, errorx.New("🔥🔥當前活動太火爆，伺服器擁堵，請稍後再重試...")
 	}
 
-	//如果已經抽中过奖品，则提示已经抽中过奖品
 	//非註冊用戶，不让中奖
 	mustFail := !isRegistered
 	award, err := randomAward(awards, mustFail, availableAwardsIds)
