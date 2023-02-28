@@ -19,10 +19,16 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - GOPROXY=https://goproxy.cn,direct
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      # - MYSQL_USER=${MYSQL_USERNAME}
+      # - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
     volumes:
       - .:/app
     ports:
-      - 6868:8888
+      - 9100:8888
     working_dir: /app
     restart: on-failure
     privileged: true
@@ -30,6 +36,8 @@ services:
     tty: true
     networks:
       - backend_net
+    depends_on:
+      - mysql
 
   #mysql数据库容器
   mysql:
@@ -39,8 +47,8 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USERNAME}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      # - MYSQL_USER=${MYSQL_USERNAME}
+      # - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       # - MYSQL_ALLOW_EMPTY_PASSWORD=true
     expose:
@@ -69,22 +77,21 @@ services:
     hostname: phpmyadmin
     restart: on-failure
     ports:
-      - 6869:80
+      - 9101:80
     environment:
       - TZ=Asia/Shanghai
-      - MYSQL_USER=${MYSQL_USERNAME}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - PMA_ARBITRARY=1 #当设置为 1 连接到任意服务器将被允许
       - PMA_HOST=${MYSQL_HOST} #定义 MySQL 服务器的地址/主机名
-      - PMA_PORT=3306 # 定义 MySQL 服务器的端口
-      - PMA_VERBOSE=luckydraw_mysql #MySQL 服务器的详细名称
+      - PMA_PORT=${MYSQL_PORT} # 定义 MySQL 服务器的端口
+      - PMA_VERBOSE=luckydraw_mysql # MySQL 服务器的详细名称
+      - PMA_PMADB=phpmyadmin # 用于phpMyAdmin 配置存储数据库的数据库名称,如果未设置，则默认情况下不会启用高级功能：用户在使用零配置（零配置）功能登录时仍可能启用这些功能
       - PMA_USER=root
       - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      # - PMA_CONTROLUSER=${CONTROLUSER}
-      # - PMA_CONTROLPASS=${CONTROLPASS}
+      - PMA_CONTROLUSER=root
+      - PMA_CONTROLPASS=${MYSQL_ROOT_PASSWORD}
     volumes:
       - ./data/phpmyadmin/config:/etc/phpmyadmin
+      - ./data/phpmyadmin/config/config.inc.php:/etc/phpmyadmin/config.inc.php
     depends_on:
       - mysql
     networks:

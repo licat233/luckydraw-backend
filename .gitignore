@@ -21,7 +21,7 @@
 */rpc/logs/*
 */logs/
 build/
-data/
+# data/
 logs/
 ui/admin/node_modules
 ui/luckydraw/node_modules

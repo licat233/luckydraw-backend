@@ -9,11 +9,9 @@ package logic
 
 import (
 	"context"
-	"errors"
 
-	"luckydraw-backend/common/errorx"
+	"luckydraw-backend/common/respx"
 	"luckydraw-backend/internal/svc"
-	"luckydraw-backend/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,10 +30,6 @@ func NewTestLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TestLogic {
 	}
 }
 
-func (l *TestLogic) Test() (resp *types.BaseResp, err error) {
-	resp = new(types.BaseResp)
-	resp.Status = true
-	resp.Message = "hello"
-	err = errorx.ExternalError(errors.New("test error"))
-	return
+func (l *TestLogic) Test() (any, error) {
+	return respx.New("hello"), nil
 }

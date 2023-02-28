@@ -10,7 +10,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 RUN apk update --no-cache && apk add --no-cache tzdata bash git
 ENV TZ Asia/Shanghai
 
-WORKDIR /go
+WORKDIR /app
 
 RUN go install github.com/zeromicro/go-zero/tools/goctl@latest
 RUN go install github.com/zeromicro/goctl-swagger@latest
