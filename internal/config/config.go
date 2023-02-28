@@ -15,6 +15,10 @@ type Config struct {
 		AccessSecret string
 		AccessExpire int64
 	}
+	UserAuth struct {
+		AccessSecret string
+		AccessExpire int64
+	}
 	Mysql struct {
 		DataSource string
 	}

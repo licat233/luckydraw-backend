@@ -49,77 +49,64 @@ func NewLuckydrawLogic(ctx context.Context, svcCtx *svc.ServiceContext, r *http.
 
 // 要求指定用户才能抽，且只能抽中一次
 func (l *LuckydrawLogic) Luckydraw(req *types.LuckydrawReq) (any, error) {
+	var errorZeroCount = errorx.New("Sorry！你的抽獎次數為0，可聯絡客服獲取")
 	// 一、先判断该用户是否已经注册
 	userId := ctxdata.GetUidFromCtx(l.ctx)
 	activityId := ctxdata.GetAidFromCtx(l.ctx)
+
+	passport := strings.TrimSpace(req.Passport)
+	activityUuid := strings.TrimSpace(req.ActivityUuid)
+	if passport == "" && userId < 1 {
+		return nil, errorZeroCount
+	}
+	if activityId < 1 && activityUuid == "" {
+		return nil, errorx.New("錯誤的請求參數")
+	}
 	var err error
 	var activity *model.Activity
-	if activityId == 0 {
-		activity, err = l.svcCtx.ActivityModel.FindOneByUuid(l.ctx, req.ActivityUuid)
+	//如果activityId不存在，则通過activityUuid查询
+	if activityId < 1 {
+		activity, err = l.svcCtx.ActivityModel.FindOneByUuid(l.ctx, activityUuid)
 		if err != nil && err != model.ErrNotFound {
 			l.Logger.Errorf("查询活动失败，err:%v", err)
 			return nil, errorx.InternalError(err)
 		}
-		if err == model.ErrNotFound {
-			activityId = 0
-		} else {
-			activityId = activity.Id
-		}
-	}
-	if activityId == 0 {
-		return nil, errorx.New("活動已不存在")
-	}
-	if activity == nil {
+	} else {
+		//否则通过activityId查询
 		activity, err = l.svcCtx.ActivityModel.FindOne(l.ctx, activityId)
 		if err != nil && err != model.ErrNotFound {
 			l.Logger.Errorf("查询活动失败，err:%v", err)
 			return nil, errorx.InternalError(err)
 		}
-		if err == model.ErrNotFound {
-			return nil, errorx.New("活動已不存在")
-		}
 	}
+	if err == model.ErrNotFound || activity == nil {
+		return nil, errorx.New("活動已不存在")
+	}
+
 	if activity.Status != 1 {
 		return nil, errorx.New("Sorry！此活動已結束，感謝你的關注，請添加官方客服，獲取最新活動。")
 	}
-	isRegistered := false
+
+	activityId = activity.Id
+
 	var user *model.Users
-	if userId == 0 && req.Passport != "" && activityId != 0 {
-		user, err = l.svcCtx.UsersModel.FindsByPassportAndActivityId(l.ctx, req.Passport, activityId)
+	//如果userId不存在，则通过passport查询
+	if userId < 1 {
+		user, err = l.svcCtx.UsersModel.FindsByPassportAndActivityId(l.ctx, passport, activityId)
 		if err != nil && err != model.ErrNotFound {
 			l.Logger.Errorf("查询用户失败，err:%v", err)
 			return nil, errorx.InternalError(err)
 		}
-		if err == model.ErrNotFound {
-			userId = 0
-		} else {
-			isRegistered = true
-			userId = user.Id
-		}
-	}
-
-	if userId == 0 {
-		if req.Passport == "" {
-			return nil, errorx.New("Sorry！你暫無抽獎權限，可聯絡客服獲取", "")
-		}
-		return nil, errorx.New("Sorry！你的抽獎次數為0，可聯絡客服獲取", "")
-	}
-
-	if user == nil {
+	} else {
 		user, err = l.svcCtx.UsersModel.FindsByIdAndActivityId(l.ctx, userId, activityId)
 		if err != nil && err != model.ErrNotFound {
 			l.Logger.Errorf("查询用户失败，err:%v", err)
 			return nil, errorx.InternalError(err)
 		}
-		isRegistered = err == nil
 	}
-
-	if !isRegistered {
-		return nil, errorx.New("Sorry！你的抽獎次數為0，可聯絡客服獲取", "")
-	}
-
-	if user.Count >= user.Total {
-		return nil, errorx.New("Sorry！你的抽獎次數已用完，請聯絡客服獲取", "")
+	if err == model.ErrNotFound || user == nil {
+		//如果没有注册，那就提示抽奖次数为0
+		return nil, errorZeroCount
 	}
 
 	if user.Count >= user.Total {
@@ -145,8 +132,11 @@ func (l *LuckydrawLogic) Luckydraw(req *types.LuckydrawReq) (any, error) {
 		return nil, errorx.InternalError(err)
 	}
 	if len(awards) == 0 {
+		//找个理由搪塞过去
 		return nil, errorx.New("🔥🔥當前活動太火爆，伺服器擁堵，請稍後再重試...")
 	}
+
+	isRegistered := userId > 1
 
 	//非註冊用戶，不让中奖
 	mustFail := !isRegistered

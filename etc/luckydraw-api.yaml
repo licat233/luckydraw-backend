@@ -12,3 +12,7 @@ Mysql:
 Auth:
   AccessSecret: wwwpppooowwwoooo
   AccessExpire: 86400
+
+UserAuth:
+  AccessSecret: wwwpppooowwqqqqq
+  AccessExpire: 86400

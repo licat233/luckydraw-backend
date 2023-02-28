@@ -71,7 +71,7 @@ func (l *UserLoginLogic) UserLogin(req *types.UserLoginReq) (any, error) {
 		userId = user.Id
 	}
 	second := l.svcCtx.Config.Auth.AccessExpire
-	token, err := l.getJwtToken(l.svcCtx.Config.Auth.AccessSecret, time.Now().Unix(), second, userId, activityId)
+	token, err := l.getJwtToken(l.svcCtx.Config.UserAuth.AccessSecret, time.Now().Unix(), second, userId, activityId)
 	if err != nil {
 		l.Logger.Errorf("生成jwt失败，err:%v", err)
 		return nil, errorx.InternalError(err)
