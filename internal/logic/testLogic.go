@@ -31,5 +31,6 @@ func NewTestLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TestLogic {
 }
 
 func (l *TestLogic) Test() (any, error) {
-	return respx.New("hello"), nil
+	err := l.svcCtx.UsersModel.CountAdd(l.ctx, 1, 3)
+	return respx.New("hello"), err
 }

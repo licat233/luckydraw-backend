@@ -173,4 +173,5 @@ service luckydraw-api {
   @handler CurrentUser
   post /currentUser(currentUserReq) returns (BaseResp)
 }
+
 //[custom service end]

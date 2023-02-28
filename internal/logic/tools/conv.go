@@ -109,6 +109,9 @@ func UserToModel(req *types.Users) *model.Users {
 }
 
 func UserToResp(data *model.Users) *types.Users {
+	if data == nil {
+		return nil
+	}
 	return &types.Users{
 		Id:              data.Id,
 		ActivityId:      data.ActivityId,
@@ -121,6 +124,9 @@ func UserToResp(data *model.Users) *types.Users {
 }
 
 func WinningRecordsToModel(req *types.WinningRecords) *model.WinningRecords {
+	if req == nil {
+		return nil
+	}
 	return &model.WinningRecords{
 		Id:         req.Id,
 		UserId:     req.UserId,

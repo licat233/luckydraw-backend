@@ -60,9 +60,13 @@ func (l *GetUsersListLogic) GetUsersList(req *types.GetUsersListReq) (any, error
 		if err != nil {
 			return nil, err
 		}
+		act := tools.ActivityToResp(activity)
+		if act == nil {
+			continue
+		}
 		data = append(data, &types.UserDetail{
 			User:            tools.UserToResp(user),
-			Activity:        tools.ActivityToResp(activity),
+			Activity:        act,
 			AvailableAwards: availableAwards,
 		})
 	}

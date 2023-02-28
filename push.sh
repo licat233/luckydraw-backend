@@ -20,4 +20,4 @@ cd $current_path
 git rm -r --cached .
 git add .
 git commit -m "update"
-git push origin main
+git push --all

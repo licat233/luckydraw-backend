@@ -67,11 +67,23 @@ func (l *GetWinningRecordsListLogic) GetWinningRecordsList(req *types.GetWinning
 		if err == model.ErrNotFound {
 			activity = nil
 		}
+		awd := tools.AwardsToResp(award)
+		if awd == nil {
+			continue
+		}
+		act := tools.ActivityToResp(activity)
+		if act == nil {
+			continue
+		}
+		usr := tools.UserToResp(user)
+		if usr == nil {
+			continue
+		}
 		data = append(data, &types.WinningRecordsDetail{
 			WinningRecord: tools.WinningRecordsToResp(record),
-			Award:         tools.AwardsToResp(award),
-			User:          tools.UserToResp(user),
-			Activity:      tools.ActivityToResp(activity),
+			Award:         awd,
+			User:          usr,
+			Activity:      act,
 		})
 	}
 	return respx.NewListData(data, total, req.PageSize, req.Page), nil

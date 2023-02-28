@@ -104,10 +104,13 @@ func (l *LuckydrawLogic) Luckydraw(req *types.LuckydrawReq) (any, error) {
 			return nil, errorx.InternalError(err)
 		}
 	}
+
 	if err == model.ErrNotFound || user == nil {
 		//如果没有注册，那就提示抽奖次数为0
 		return nil, errorZeroCount
 	}
+
+	userId = user.Id
 
 	if user.Count >= user.Total {
 		return nil, errorx.New("Sorry！你的抽獎次數已用完，請聯絡客服獲取", "")
@@ -164,7 +167,7 @@ func (l *LuckydrawLogic) Luckydraw(req *types.LuckydrawReq) (any, error) {
 		return nil, errorx.InternalError(err)
 	}
 	//用户的抽奖次数也加+1
-	if err = l.svcCtx.UsersModel.CountAdd(l.ctx, 1, userId); err != nil {
+	if err = l.svcCtx.UsersModel.CountAdd(l.ctx, 1, user.Id); err != nil {
 		l.Logger.Errorf("更新用户抽奖次数失败，err:%v", err)
 		return nil, errorx.InternalError(err)
 	}

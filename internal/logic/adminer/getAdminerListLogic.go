@@ -32,6 +32,7 @@ func (l *GetAdminerListLogic) GetAdminerList(req *types.GetAdminerListReq) (any,
 		Id:       req.Id,
 		Username: req.Username,
 		Password: req.Password,
+		Access:   req.Access,
 		IsSuper:  req.IsSuper,
 	}
 	data, total, err := l.svcCtx.AdminerModel.FindList(l.ctx, req.PageSize, req.Page, req.Keyword, in)

@@ -36,7 +36,7 @@ func (l *SelectAwardsByIdsLogic) SelectAwardsByIds(req *types.SelectAwardsByIdsR
 }
 
 func (l *SelectAwardsByIdsLogic) SelectAwards(ids []int64) ([]*types.Awards, error) {
-	var list = make([]*types.Awards, 0)
+	var list []*types.Awards
 	if len(ids) == 0 {
 		return list, nil
 	}
@@ -47,7 +47,7 @@ func (l *SelectAwardsByIdsLogic) SelectAwards(ids []int64) ([]*types.Awards, err
 			return nil, errorx.InternalError(err)
 		}
 		if err == model.ErrNotFound {
-			data = nil
+			continue
 		}
 		list = append(list, tools.AwardsToResp(data))
 	}
