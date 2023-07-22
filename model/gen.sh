@@ -13,7 +13,7 @@ current_path=$(
 
 cd $current_path
 
-goctl model mysql ddl --src luckydraw.sql -dir .
+goctl model mysql ddl --src="../deploy/mysql/luckydraw.sql" --dir="."
 
 name="luckydraw"
 filename="luckydraw.api"

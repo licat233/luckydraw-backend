@@ -9,13 +9,13 @@ package svc
 
 import (
 	"log"
+	"luckydraw-backend/common/mysqlx"
 	"luckydraw-backend/internal/config"
 	"luckydraw-backend/internal/middleware"
 	"luckydraw-backend/model"
 	"time"
 
 	"github.com/mojocn/base64Captcha"
-	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"github.com/zeromicro/go-zero/rest"
 )
 
@@ -35,16 +35,10 @@ type ServiceContext struct {
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	sqlConn := sqlx.NewMysql(c.Mysql.DataSource)
-
-	db, err := sqlConn.RawDB()
+	sqlConn, err := mysqlx.NewMysql(c.Mysql.DataSource)
 	if err != nil {
-		log.Fatalln("创建数据库链接失败", c.Mysql.DataSource)
+		log.Fatalln("数据库初始化失败", c.Mysql.DataSource)
 	}
-	if db.Ping() != nil {
-		log.Fatalln("数据库链接失败", c.Mysql.DataSource)
-	}
-	// defer db.Close()
 
 	captchaExpire := time.Minute * 5
 
